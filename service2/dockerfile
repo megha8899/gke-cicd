@@ -1,5 +1,5 @@
 FROM python
-WORKDIR /app/
-ADD . /app/
+WORKDIR /service2/
+ADD . /service2//
 RUN pip install aio-pika
 CMD [ "python3", "-u", "main.py" ]
