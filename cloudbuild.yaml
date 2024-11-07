@@ -1,0 +1,79 @@
+# Cloud Build Configuration File for deploying 2 Python services to GKE
+
+steps:
+  # Step 1: Build Docker images for both services
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build service 1'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
+      - './service1'
+    dir: './service1'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build service 2'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
+      - './service2'
+    dir: './service2'
+
+  # Step 2: Push the images to Google Artifact Registry
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push service 1 image'
+    args:
+      - 'push'
+      - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push service 2 image'
+    args:
+      - 'push'
+      - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
+
+  # Step 3: Deploy to Google Kubernetes Engine (GKE)
+
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    id: 'Deploy to GKE'
+    args:
+      - '--cluster'
+      - 'gke-cicd'
+      - '--location'
+      - 'us-central1'  # Update with your cluster location
+      - '--namespace'
+      - 'default'  # Update with your desired namespace
+      - '--deployment'
+      - 'service1-deployment'
+      - '--image'
+      - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
+      - '--set-env-vars'
+      - 'SERVICE1_ENV_VAR=value'  # Optional: Set any environment variables for service1
+
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    id: 'Deploy service 2 to GKE'
+    args:
+      - '--cluster'
+      - 'gke-cicd'
+      - '--location'
+      - 'us-central'  # Update with your cluster location
+      - '--namespace'
+      - 'default'  # Update with your desired namespace
+      - '--deployment'
+      - 'service2-deployment'
+      - '--image'
+      - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
+      - '--set-env-vars'
+      - 'SERVICE2_ENV_VAR=value'  # Optional: Set any environment variables for service2
+
+# Optional: Trigger on push to master branch
+trigger:
+  branch: 'master'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+
