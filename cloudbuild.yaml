@@ -67,10 +67,6 @@ steps:
       - '--set-env-vars'
       - 'SERVICE2_ENV_VAR=value'  # Optional: Set any environment variables for service2
 
-# Optional: Trigger on push to master branch
-trigger:
-  branch: 'master'
-
 options:
   logging: CLOUD_LOGGING_ONLY
 
