@@ -6,18 +6,18 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build service 1'
     args:
+      - 'build'
       - '-t'
       - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
-      - './service1'
-    dir: './service1'
+      - '.'
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build service 2'
     args:
+      - 'build'
       - '-t'
       - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
-      - './service2'
-    dir: './service2'
+      - '.'
 
   # Step 2: Push the images to Google Artifact Registry
 
