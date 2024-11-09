@@ -57,7 +57,7 @@ steps:
       - '--cluster'
       - 'gke-cicd'
       - '--location'
-      - 'us-central'  # Update with your cluster location
+      - 'us-central1'  # Update with your cluster location
       - '--namespace'
       - 'default'  # Update with your desired namespace
       - '--deployment'
