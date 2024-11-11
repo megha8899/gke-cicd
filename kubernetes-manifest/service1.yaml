@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-notifier
+  labels:
+    app: rabbitmq-notifier
+spec:
+  replicas: 3  # Number of pods to run
+  selector:
+    matchLabels:
+      app: rabbitmq-notifier
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-notifier
+    spec:
+      containers:
+      - name: rabbitmq-notifier
+        image: your-docker-image:latest  # Replace with your Docker image
+        ports:
+        - containerPort: 8080  # Change to the port your app listens on, if applicable
+        env:
+        - name: RABBITMQ_HOST
+          value: "rabbitmq-service"  # Change to your RabbitMQ service name
+        - name: RABBITMQ_PORT
+          value: "5672"  # Default RabbitMQ port
+        - name: RABBITMQ_QUEUE
+          value: "notifications"  # Name of the queue you're subscribing to
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/app-config  # If you have config files or secrets to mount
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config  # If you're using a ConfigMap
+      imagePullSecrets:
+      - name: regcred  # If you're pulling from a private registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-notifier-service
+spec:
+  selector:
+    app: rabbitmq-notifier
+  ports:
+    - protocol: TCP
+      port: 8080  # The port exposed within the Kubernetes cluster
+      targetPort: 8080  # The container port your app is listening on
+  clusterIP: None  # Optional: Use None for headless service if you need direct pod access
+
