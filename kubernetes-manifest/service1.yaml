@@ -1,51 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq-notifier
+  name: balance-change-notifier
   labels:
-    app: rabbitmq-notifier
+    app: balance-change-notifier
 spec:
-  replicas: 3  # Number of pods to run
+  replicas: 3  # Number of pods to run for horizontal scaling
   selector:
     matchLabels:
-      app: rabbitmq-notifier
+      app: balance-change-notifier
   template:
     metadata:
       labels:
-        app: rabbitmq-notifier
+        app: balance-change-notifier
     spec:
       containers:
-      - name: rabbitmq-notifier
+      - name: balance-change-notifier
         image: your-docker-image:latest  # Replace with your Docker image
         ports:
-        - containerPort: 8080  # Change to the port your app listens on, if applicable
+        - containerPort: 8080  # Port the app listens on, if applicable
         env:
         - name: RABBITMQ_HOST
-          value: "rabbitmq-service"  # Change to your RabbitMQ service name
+          value: "rabbitmq-service"  # The RabbitMQ service name
         - name: RABBITMQ_PORT
           value: "5672"  # Default RabbitMQ port
         - name: RABBITMQ_QUEUE
-          value: "notifications"  # Name of the queue you're subscribing to
+          value: "balance-updates"  # The queue you're consuming messages from
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: username  # Assumes username is stored in a Secret
+        - name: RABBITMQ_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: password  # Assumes password is stored in a Secret
         volumeMounts:
         - name: config-volume
-          mountPath: /etc/app-config  # If you have config files or secrets to mount
+          mountPath: /etc/app-config  # If you mount any configuration files
       volumes:
       - name: config-volume
         configMap:
-          name: app-config  # If you're using a ConfigMap
+          name: app-config  # If you're using a ConfigMap for app settings
       imagePullSecrets:
       - name: regcred  # If you're pulling from a private registry
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq-notifier-service
+  name: balance-change-notifier-service
 spec:
   selector:
-    app: rabbitmq-notifier
+    app: balance-change-notifier  # This should match the label in the Deployment
   ports:
     - protocol: TCP
-      port: 8080  # The port exposed within the Kubernetes cluster
-      targetPort: 8080  # The container port your app is listening on
-  clusterIP: None  # Optional: Use None for headless service if you need direct pod access
+      port: 8080  # This is the port exposed within the cluster (or externally if you need)
+      targetPort: 8080  # Port your application container listens on
+  clusterIP: None  # Optional: Use None for headless service if direct pod-to-pod communication is needed
 
