@@ -7,6 +7,8 @@ steps:
     id: 'Build service 1'
     args:
       - 'build'
+      - '-f'
+      - 'service1/dockerfile'
       - '-t'
       - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
       - '.'
@@ -15,6 +17,8 @@ steps:
     id: 'Build service 2'
     args:
       - 'build'
+      - '-f'
+      - 'service2/dockerfile'
       - '-t'
       - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
       - '.'
