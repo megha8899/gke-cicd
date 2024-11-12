@@ -42,7 +42,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gke-deploy'
     id: 'Deploy to GKE'
     args:
-      - '--location'
+      - '--region'
       - 'us-central1'  # Update with your cluster location
       - '--namespace'
       - 'default'  # Update with your desired namespace
@@ -56,7 +56,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gke-deploy'
     id: 'Deploy service 2 to GKE'
     args:
-      - '--location'
+      - '--region'
       - 'us-central1'  # Update with your cluster location
       - '--namespace'
       - 'default'  # Update with your desired namespace
