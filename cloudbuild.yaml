@@ -42,8 +42,6 @@ steps:
   - name: 'gcr.io/cloud-builders/gke-deploy'
     id: 'Deploy to GKE'
     args:
-      - '--cluster'
-      - 'gke-cicd'
       - '--location'
       - 'us-central1'  # Update with your cluster location
       - '--namespace'
@@ -58,8 +56,6 @@ steps:
   - name: 'gcr.io/cloud-builders/gke-deploy'
     id: 'Deploy service 2 to GKE'
     args:
-      - '--cluster'
-      - 'gke-cicd'
       - '--location'
       - 'us-central1'  # Update with your cluster location
       - '--namespace'
