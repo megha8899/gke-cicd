@@ -38,27 +38,21 @@ steps:
       - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
 
   # Step 3: Deploy to Google Kubernetes Engine (GKE)
-
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    id: 'Deploy to GKE'
+      
+  - name: "gcr.io/cloud-builders/gke-deploy"
     args:
-      - '--deployment'
-      - 'service1-deployment'
-      - '--image'
-      - 'gcr.io/innate-mix-440218-i6/service1:$SHORT_SHA'
-      - '--set-env-vars'
-      - 'SERVICE1_ENV_VAR=value'  # Optional: Set any environment variables for service1
-
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    id: 'Deploy service 2 to GKE'
+    - run
+    - --filename='gcr.io/innate-mix-440218-i6/kubernetes-manifest/service1.yaml'
+    - --location='us-central1'
+    - --cluster='gke-cicd'
+  
+    - name: "gcr.io/cloud-builders/gke-deploy"
     args:
-      - '--deployment'
-      - 'service2-deployment'
-      - '--image'
-      - 'gcr.io/innate-mix-440218-i6/service2:$SHORT_SHA'
-      - '--set-env-vars'
-      - 'SERVICE2_ENV_VAR=value'  # Optional: Set any environment variables for service2
-
+    - run
+    - --filename='gcr.io/innate-mix-440218-i6/kubernetes-manifest/service2.yaml'
+    - --location='us-central1'
+    - --cluster='gke-cicd'
+    
 options:
   logging: CLOUD_LOGGING_ONLY
 
