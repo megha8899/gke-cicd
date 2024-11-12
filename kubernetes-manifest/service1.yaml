@@ -36,13 +36,23 @@ spec:
             secretKeyRef:
               name: rabbitmq-credentials
               key: password  # Assumes password is stored in a Secret
+        - name: CONFIG_KEY1
+          valueFrom:
+            configMapKeyRef:
+              name: app-config  # Refers to the ConfigMap created
+              key: config-key1  # The specific key in the ConfigMap
+        - name: CONFIG_KEY2
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: config-key2
         volumeMounts:
         - name: config-volume
           mountPath: /etc/app-config  # If you mount any configuration files
       volumes:
       - name: config-volume
         configMap:
-          name: app-config  # If you're using a ConfigMap for app settings
+          name: app-config  # Refers to the ConfigMap
       imagePullSecrets:
       - name: regcred  # If you're pulling from a private registry
 ---
@@ -58,4 +68,3 @@ spec:
       port: 8080  # This is the port exposed within the cluster (or externally if you need)
       targetPort: 8080  # Port your application container listens on
   clusterIP: None  # Optional: Use None for headless service if direct pod-to-pod communication is needed
-
