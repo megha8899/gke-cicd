@@ -16,25 +16,25 @@ spec:
     spec:
       containers:
       - name: rabbitmq-notifier
-        image: your-docker-image:latest  # Replace with your Docker image
+        image: your-docker-image:latest  # Replace with your actual Docker image
         ports:
-        - containerPort: 8080  # Change to the port your app listens on, if applicable
+        - containerPort: 8080  # The port your app listens on
         env:
         - name: RABBITMQ_HOST
-          value: "rabbitmq-service"  # Change to your RabbitMQ service name
+          value: "rabbitmq-service"  # RabbitMQ service name (should match the service name)
         - name: RABBITMQ_PORT
           value: "5672"  # Default RabbitMQ port
         - name: RABBITMQ_QUEUE
-          value: "notifications"  # Name of the queue you're subscribing to
+          value: "notifications"  # Name of the RabbitMQ queue
         volumeMounts:
         - name: config-volume
-          mountPath: /etc/app-config  # If you have config files or secrets to mount
+          mountPath: /etc/app-config  # Mount a ConfigMap or secret here, if required
       volumes:
       - name: config-volume
         configMap:
-          name: app-config  # If you're using a ConfigMap
+          name: app-config  # This must be a valid ConfigMap name in the same namespace
       imagePullSecrets:
-      - name: regcred  # If you're pulling from a private registry
+      - name: regcred  # If using a private Docker registry, ensure this secret exists
 ---
 apiVersion: v1
 kind: Service
@@ -42,10 +42,9 @@ metadata:
   name: rabbitmq-notifier-service
 spec:
   selector:
-    app: rabbitmq-notifier
+    app: rabbitmq-notifier  # Ensure this matches the label of the pods in the Deployment
   ports:
     - protocol: TCP
-      port: 8080  # The port exposed within the Kubernetes cluster
-      targetPort: 8080  # The container port your app is listening on
-  clusterIP: None  # Optional: Use None for headless service if you need direct pod access
-
+      port: 8080  # The port the service will expose internally in the cluster
+      targetPort: 8080  # The port your app is listening on inside the pod
+  clusterIP: None  # Optional: Headless service, allows for direct pod access (e.g., StatefulSet)
